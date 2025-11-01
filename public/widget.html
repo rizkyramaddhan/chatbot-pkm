@@ -1,49 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<style>
-:root{ --primary:#0b84ff; --bg:#ffffff; --muted:#6b7280 }
-.gc-widget { position:fixed; right:20px; bottom:20px; z-index:9999; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; }
-.gc-button { width:64px; height:64px; border-radius:999px; background:var(--primary); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(11,132,255,0.24); cursor:pointer; border:0; }
-.gc-button svg{ width:28px; height:28px; color:white }
-.gc-panel { width:360px; max-width:calc(100vw - 40px); height:520px; background:var(--bg); border-radius:12px; box-shadow:0 20px 50px rgba(2,6,23,0.2); overflow:hidden; transform-origin:bottom right; display:flex; flex-direction:column; margin-bottom:10px }
-.gc-header{ padding:12px 14px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #eef2f7 }
-.gc-title{ font-weight:600; font-size:15px }
-.gc-body{ flex:1; padding:12px; overflow:auto; display:flex; flex-direction:column; gap:8px }
-.gc-input{ display:flex; gap:8px; padding:12px; border-top:1px solid #eef2f7 }
-.gc-input input{ flex:1; padding:10px 12px; border-radius:999px; border:1px solid #e6eef8 }
-.gc-input button{ padding:10px 14px; border-radius:999px; border:0; background:var(--primary); color:white; cursor:pointer }
-.msg { max-width:78%; padding:8px 12px; border-radius:12px; display:inline-block }
-.msg.bot{ background:#f3f6fb; align-self:flex-start }
-.msg.user{ background:var(--primary); color:white; align-self:flex-end }
-.meta{ font-size:12px; color:var(--muted); margin-bottom:6px }
-/* hidden by default */
-.gc-hidden{ display:none }
-@media (max-width:420px){ .gc-panel{ width:92vw; height:70vh; right:4vw } }
-</style>
-</head>
-<body>
-<div class="gc-widget" id="gc-widget">
-<div id="gc-panel" class="gc-panel gc-hidden" role="dialog" aria-label="Chatbot">
-<div class="gc-header">
-<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(90deg,var(--primary),#6fb3ff)"></div>
-<div>
-<div class="gc-title">Chat dengan Kami</div>
-<div class="meta">Bantuan otomatis — cepat & sopan</div>
-</div>
-</div>
-<div class="gc-body" id="gc-body"></div>
-<div class="gc-input">
-<input id="gc-input" type="text" placeholder="Tanyakan sesuatu..." aria-label="Pesan" />
-<button id="gc-send">Kirim</button>
-</div>
-</div>
-<button id="gc-toggle" class="gc-button" aria-label="Buka chat">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-</button>
-</div>
-<script src="widget.js" defer></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="gc-widget" id="gc-widget">
+      <div
+        id="gc-panel"
+        class="gc-panel gc-hidden"
+        role="dialog"
+        aria-label="Chatbot"
+      >
+        <div class="gc-header">
+          <div
+            style="
+              width: 40px;
+              height: 40px;
+              border-radius: 10px;
+              background: linear-gradient(90deg, var(--primary), #6fb3ff);
+            "
+          ></div>
+          <div>
+            <div class="gc-title">Chat dengan Kami</div>
+            <div class="meta">Bantuan otomatis — cepat & sopan</div>
+          </div>
+        </div>
+        <div class="gc-body" id="gc-body"></div>
+        <div class="gc-input">
+          <input
+            id="gc-input"
+            type="text"
+            placeholder="Tanyakan sesuatu..."
+            aria-label="Pesan"
+          />
+          <button id="gc-send">Kirim</button>
+        </div>
+      </div>
+      <button id="gc-toggle" class="gc-button" aria-label="Buka chat">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    <script src="widget.js" defer></script>
+  </body>
 </html>
