@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>Admin Intents CSV</title>
+<style>
+  body {
+    font-family: system-ui, Arial, sans-serif;
+    max-width: 720px;
+    margin: 40px auto;
+    padding: 0 16px;
+  }
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  input[type="file"] {
+    margin-top: 8px;
+  }
+  pre {
+    white-space: pre-wrap;
+    background: #fafafa;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+  }
+</style>
+
+<div class="card">
+  <h3>Unduh Template (CSV aktif)</h3>
+  <button id="btnDownload">Download</button>
+</div>
+
+<div class="card">
+  <h3>Upload CSV Baru</h3>
+  <input type="file" id="file" accept=".csv" />
+  <button id="btnUpload">Upload & Validate</button>
+  <pre id="out"></pre>
+</div>
+
+<div class="card">
+  <h3>History</h3>
+  <button id="btnList">Refresh Daftar</button>
+  <ul id="hist"></ul>
+</div>
+
+<script>
+  // Endpoint: pastikan kamu sudah membuat public/api/chatbot.php
+  // yang isinya:  <?php require __DIR__ . '/../../backend/chatbot.php';
+  const API_BASE = "./api/chatbot.php";
+
+  async function api(action, formData) {
+    const url = `${API_BASE}?action=${encodeURIComponent(action)}`;
+    const res = await fetch(url, {
+      method: formData ? "POST" : "GET",
+      body: formData || null,
+      credentials: "include", // kalau backend butuh cookie/sesi
+    });
+
+    // Tangani 4xx/5xx lebih manusiawi
+    const ct = res.headers.get("content-type") || "";
+    const body = await res.text();
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}. Body: ${body.slice(0, 200)}`);
+    }
+    if (!ct.includes("application/json")) {
+      throw new Error(
+        `Expected JSON, got "${ct}". Body starts with: ${body.slice(0, 120)}`
+      );
+    }
+
+    try {
+      return JSON.parse(body);
+    } catch (e) {
+      throw new Error(`Bad JSON: ${e.message}. Body: ${body.slice(0, 200)}`);
+    }
+  }
+
+  // Download template/aktif intents.csv
+  document.getElementById("btnDownload").onclick = async () => {
+    try {
+      const data = await api("intents_template");
+      if (!data.ok) {
+        alert(data.error || "error");
+        return;
+      }
+      // base64 → Blob (lebih aman ketimbang langsung atob ke Blob untuk file non-ASCII)
+      const bin = atob(data.content_base64 || "");
+      const buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      const blob = new Blob([buf], { type: "text/csv;charset=utf-8" });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.filename || "intents.csv";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Download gagal");
+    }
+  };
+
+  // Upload intents.csv
+  document.getElementById("btnUpload").onclick = async () => {
+    const f = document.getElementById("file").files[0];
+    if (!f) {
+      alert("Pilih file CSV dulu.");
+      return;
+    }
+    const fd = new FormData();
+    fd.append("file", f);
+
+    try {
+      const data = await api("upload_intents", fd);
+      document.getElementById("out").textContent = JSON.stringify(
+        data,
+        null,
+        2
+      );
+      alert(data.ok ? data.message || "Berhasil" : data.error || "Gagal");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Upload gagal");
+    }
+  };
+
+  // List history + tombol Restore
+  document.getElementById("btnList").onclick = async () => {
+    const ul = document.getElementById("hist");
+    ul.innerHTML = "";
+    try {
+      const data = await api("intents_history");
+      if (!data.ok) {
+        alert(data.error || "Gagal mengambil history");
+        return;
+      }
+      (data.history || []).forEach((h) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.textContent = "Restore";
+        btn.onclick = async () => {
+          try {
+            const fd = new FormData();
+            fd.append("filename", h.filename);
+            const res = await api("restore_intents", fd);
+            alert(res.message || res.error || "Selesai");
+          } catch (e) {
+            alert(e.message || "Restore gagal");
+          }
+        };
+        li.textContent = `${h.filename} — ${h.modified} — ${h.size} bytes `;
+        li.appendChild(btn);
+        ul.appendChild(li);
+      });
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Gagal memuat history");
+    }
+  };
+</script>

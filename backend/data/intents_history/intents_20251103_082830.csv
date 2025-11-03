@@ -1,0 +1,4 @@
+id,intent_name,samples,response_template
+1,greeting,"halo||hai||selamat pagi||selamat siang||selamat sore||selamat malam","Hai! Ada yang bisa saya bantu?"
+2,contact,"kontak||email||telepon||hubungi||wa||nomor telepon||no hp||cs||admin","Anda dapat menghubungi kami di: contact@org.com"
+3,about,"tentang||profil||siapa kalian||tentang kami||siapa kamu||apa itu","Kami adalah organisasi yang fokus pada layanan terbaik."
